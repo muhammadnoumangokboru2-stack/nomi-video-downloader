@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>Nomi Video Downloader</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#141d30;--line:#2b3852;--text:#f4f7ff;--muted:#aab6cc;--accent:#7c5cff;--accent2:#20c7a5}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:radial-gradient(ellipse at top,#1b2850 0,#0b1020 55%);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+main{width:min(900px,92%);margin:56px auto;flex:1}.brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:24px;box-shadow:0 8px 28px #0005}.brand h1{font-size:clamp(25px,4vw,38px);margin:0;letter-spacing:-1px}.sub{text-align:center;color:var(--muted);margin:-14px 0 28px}
+.panel{background:#141d30eF;border:1px solid var(--line);border-radius:24px;padding:clamp(20px,4vw,34px);box-shadow:0 24px 70px #0005}.label{display:block;font-weight:650;margin:0 0 10px}.urlrow{display:flex;gap:10px}.urlrow input{min-width:0;flex:1}.field,select{width:100%;background:#0c1426;border:1px solid #35435f;color:var(--text);border-radius:12px;padding:15px 14px;font-size:15px;outline:none}.field:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px #7c5cff30}button{border:0;border-radius:12px;padding:14px 19px;font-size:15px;font-weight:750;cursor:pointer;background:linear-gradient(135deg,var(--accent),#5d79ff);color:white}button:hover{filter:brightness(1.1)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}.hint{color:var(--muted);font-size:13px;line-height:1.5;margin:9px 0 0}.preview{display:none;margin-top:24px}.preview iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:14px;background:#080b12}.status{margin-top:20px;padding:14px 16px;border:1px solid #3a4c69;border-radius:12px;background:#0d1628;color:#d9e4f8;line-height:1.55}.status strong{display:block;margin-bottom:4px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.step{padding:15px;border:1px solid var(--line);border-radius:14px;background:#0d1527}.step b{display:block;margin-bottom:7px}.step span{font-size:13px;color:var(--muted);line-height:1.5}.notice{font-size:13px;color:var(--muted);line-height:1.6;margin:20px 2px 0}footer{text-align:center;color:#7e8aa3;font-size:12px;padding:20px}
+@media(max-width:620px){main{margin:28px auto}.urlrow{flex-direction:column}.grid,.steps{grid-template-columns:1fr}.brand{margin-bottom:24px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="brand"><div class="logo">▶</div><h1>Nomi Video Downloader</h1></div>
+  <p class="sub">Paste a YouTube link • Preview it • Choose your preferred quality</p>
+  <section class="panel">
+    <label class="label" for="url">YouTube video link</label>
+    <div class="urlrow">
+      <input class="field" id="url" type="url" placeholder="https://www.youtube.com/watch?v=..." autocomplete="url">
+      <button id="previewBtn">Preview video</button>
+    </div>
+    <p class="hint">This starter website previews a link. It does not bypass YouTube restrictions or extract video files.</p>
+    <div class="grid">
+      <div>
+        <label class="label" for="quality">Preferred quality</label>
+        <select id="quality">
+          <option>144p</option><option>240p</option><option>360p</option><option>480p</option><option selected>720p HD</option><option>1080p Full HD</option><option>1440p / 2K</option><option>2160p / 4K</option>
+        </select>
+        <p class="hint">Your selection is a preference only; the available options depend on the source and permissions.</p>
+      </div>
+      <div>
+        <label class="label">Save to Gallery</label>
+        <div class="status" style="margin-top:0"><strong>Official download options</strong>Use YouTube's own Download feature where available. For your own uploads, download the original file through YouTube Studio.</div>
+      </div>
+    </div>
+    <div class="preview" id="preview">
+      <label class="label">Video preview</label>
+      <iframe id="player" title="YouTube video preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite"><strong>Ready</strong>Paste a valid YouTube video link and press Preview video.</div>
+    <div class="steps">
+      <div class="step"><b>1. Paste link</b><span>Use a standard YouTube watch or youtu.be link.</span></div>
+      <div class="step"><b>2. Preview</b><span>Check that the video is the one you want.</span></div>
+      <div class="step"><b>3. Save officially</b><span>Use download options provided by YouTube or the creator.</span></div>
+    </div>
+    <p class="notice">Note: YouTube's in-app Download option usually saves for offline viewing inside YouTube; it does not necessarily provide an MP4 file in your device Gallery. Download only videos you own or are authorized to download, using an allowed method.</p>
+  </section>
+</main>
+<footer>© Nomi Video Downloader • Free starter project</footer>
+<script>
+const urlInput=document.getElementById('url'), preview=document.getElementById('preview'), player=document.getElementById('player'), statusBox=document.getElementById('status');
+function getVideoId(raw){
+  try{
+    const u=new URL(raw.trim());
+    if(!['youtube.com','www.youtube.com','m.youtube.com','youtu.be','www.youtu.be','youtube-nocookie.com','www.youtube-nocookie.com'].includes(u.hostname)) return null;
+    if(u.hostname.includes('youtu.be')) return u.pathname.split('/').filter(Boolean)[0]||null;
+    if(u.pathname==='/watch') return u.searchParams.get('v');
+    const parts=u.pathname.split('/').filter(Boolean);
+    if(['embed','shorts','live'].includes(parts[0])) return parts[1]||null;
+    return null;
+  }catch{return null}
+}
+document.getElementById('previewBtn').addEventListener('click',()=>{
+  const id=getVideoId(urlInput.value);
+  if(!id || !/^[A-Za-z0-9_-]{6,20}$/.test(id)){
+    statusBox.innerHTML='<strong>Link check</strong>Please paste a valid YouTube video URL (watch, Shorts, or youtu.be).';
+    preview.style.display='none'; player.src=''; return;
+  }
+  player.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id);
+  preview.style.display='block';
+  statusBox.innerHTML='<strong>Preview ready</strong>Selected preference: '+document.getElementById('quality').value+'. This page does not directly convert the link into a downloadable MP4 file.';
+  preview.scrollIntoView({behavior:'smooth',block:'nearest'});
+});
+urlInput.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('previewBtn').click()});
+</script>
+</body>
+</html>
